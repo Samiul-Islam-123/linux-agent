@@ -32,6 +32,7 @@ async function main() {
       // Extract commands
       const commands = extractCommandBlock(response);
 
+      //console.log(`Commands : ${commands}`)
       // Execute commands one by one
       for (const command of commands) {
         const result = await runCommand(command);

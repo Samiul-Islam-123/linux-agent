@@ -59,15 +59,34 @@ export async function runCommand(command) {
 }
 
 export const extractCommandBlock = (text) => {
-  const commandSectionMatch = text.match(/# COMMANDS\s+([\s\S]*?)\n# EXPLANATION/i);
-  if (!commandSectionMatch) return [];
+  
+  const lines = text.split('\n');
+  const commands = [];
 
-  // Split by line, trim, and filter out empty lines
-  return commandSectionMatch[1]
-    .split('\n')
-    .map(cmd => cmd.trim())
-    .filter(Boolean);
+  let inCommandBlock = false;
+
+  for (let line of lines) {
+    line = line.trim();
+
+    if (line.toUpperCase() === '# COMMANDS') {
+      inCommandBlock = true;
+      continue;
+    }
+
+    if (line.toUpperCase() === '# EXPLANATION') {
+      break;
+    }
+
+    if (inCommandBlock) {
+      if (line !== '') {
+        commands.push(line);
+      }
+    }
+  }
+
+  return commands;
 };
+
 
 
 //playAudio('out.wav')
