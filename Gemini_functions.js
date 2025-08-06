@@ -3,7 +3,7 @@ import { saveWaveFile } from './util_functions.js';
 
 //geemini object
 const ai = new GoogleGenAI({
-    apiKey : ``
+    apiKey : `AIzaSyAfhDIPKk5araWcmPsEYcpBwOIyc-OrQ2Q`
 });
 
 export async function generateResponse(prompt){

@@ -1,6 +1,7 @@
 import readline from "readline";
 import { generateResponse, generateTTS } from "./Gemini_functions.js";
 import { playAudio } from "./SoundPlayer.js";
+import { extractCommandBlock, runCommand } from "./util_functions.js";
 
 // Create readline interface
 const rl = readline.createInterface({
@@ -17,7 +18,7 @@ function askQuestion(query) {
 async function main() {
   while (true) {
     const prompt = await askQuestion("YOU : ");
-    
+
     if (prompt.toLowerCase() === "exit") {
       console.log("SILVER : Goodbye!");
       rl.close();
@@ -25,20 +26,26 @@ async function main() {
     }
 
     try {
-        const response = await generateResponse(prompt);
-        console.log("SILVER : " + response);
-        //TTS
-        console.log('generating Speech ...')
-      await generateTTS(response)
-      console.log('Speech generated')
-      //play the audio
-      console.log('playing audio ...')
-      await playAudio('out.wav')
+      const response = await generateResponse(prompt);
+      console.log("SILVER : " + response);
 
-      //print
+      // Extract commands
+      const commands = extractCommandBlock(response);
+
+      // Execute commands one by one
+      for (const command of commands) {
+        const result = await runCommand(command);
+        console.log(`\n>> ${command}\n${result.success ? result.output : 'ERROR: ' + result.error}`);
+      }
+
+      // TTS (if needed)
+      // await generateTTS(response);
+      // await playAudio('out.wav');
+
     } catch (err) {
       console.error("SILVER : Error generating response:", err);
     }
+
   }
 }
 
