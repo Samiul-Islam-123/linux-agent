@@ -32,11 +32,26 @@ async function main() {
       // Extract commands
       const commands = extractCommandBlock(response);
 
+      const CommandOutputs = [];
+
       //console.log(`Commands : ${commands}`)
       // Execute commands one by one
       for (const command of commands) {
         const result = await runCommand(command);
+        CommandOutputs.push({
+          command: command,
+          output: result.success ? result.output : 'ERROR: ' + result.error
+        });
         console.log(`\n>> ${command}\n${result.success ? result.output : 'ERROR: ' + result.error}`);
+        console.log("--------------------------------------------------");
+        console.log(
+          await generateResponse(
+            JSON.stringify(CommandOutputs),
+            "Explain these command outputs clearly, in order."
+          )
+        );
+
+
       }
 
       // TTS (if needed)

@@ -1,6 +1,6 @@
 import wav from 'wav';
 import player from 'play-sound'
-import { exec } from "child_process";
+import { spawn } from "child_process";
 import util from "util";
 
 //player object
@@ -41,21 +41,36 @@ export async function playAudio(filePath) {
   }
 
 
-const execPromise = util.promisify(exec);
-
 export async function runCommand(command) {
-  try {
-    console.log("Running command : "+command)
-    const { stdout, stderr } = await execPromise(command);
+  return new Promise((resolve) => {
+    console.log("Running command: " + command);
 
-    if (stderr) {
-      return { success: false, error: stderr.trim() };
-    }
-    console.log(stdout)
-    return { success: true, output: stdout.trim() };
-  } catch (error) {
-    return { success: false, error: error.message };
-  }
+    const [cmd, ...args] = command.split(" ");
+    const child = spawn(cmd, args, { shell: true });
+
+    let output = "";
+    let error = "";
+
+    child.stdout.on("data", (data) => {
+      output += data.toString();
+    });
+
+    child.stderr.on("data", (data) => {
+      error += data.toString();
+    });
+
+    child.on("close", (code) => {
+      if (code === 0) {
+        resolve({ success: true, output: output.trim() });
+      } else {
+        resolve({ success: false, error: error.trim() || `Exited with code ${code}` });
+      }
+    });
+
+    child.on("error", (err) => {
+      resolve({ success: false, error: err.message });
+    });
+  });
 }
 
 export const extractCommandBlock = (text) => {
