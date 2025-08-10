@@ -45,20 +45,35 @@ export async function playAudio(filePath) {
     return new Promise((resolve) => {
       console.log("Running command: " + command);
       
-      // split the command, this is important
+      // Split the command, this is important
       const [cmd, ...args] = command.split(" ");
       
-      // Set stdio to 'inherit' to make the child process interactive
+      // Use 'pipe' to capture the stdout and stderr streams
       const child = spawn(cmd, args, { 
-        stdio: 'inherit', 
+        stdio: 'pipe', 
         shell: true 
       });
   
+      let stdoutData = "";
+      let stderrData = "";
+  
+      // Collect data from stdout stream
+      child.stdout.on("data", (data) => {
+        stdoutData += data.toString();
+      });
+  
+      // Collect data from stderr stream
+      child.stderr.on("data", (data) => {
+        stderrData += data.toString();
+      });
+  
       child.on("close", (code) => {
-        if (code === 0) {
-          resolve({ success: true, output: "Command completed successfully." });
+        // If there was an error, return the stderr output
+        if (code !== 0) {
+          resolve({ success: false, error: stderrData || `Exited with code ${code}` });
         } else {
-          resolve({ success: false, error: `Exited with code ${code}` });
+          // Otherwise, return the stdout output
+          resolve({ success: true, output: stdoutData });
         }
       });
   

@@ -1,20 +1,29 @@
 {
   "name": "gemini-speech-test",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "bot.js",
   "type": "module",
+  "bin": {
+    "silver": "./bot.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "'ai tool",
+    "agent",
+    "linux",
+    "automation"
+  ],
+  "author": "MD Samiul Islam",
   "license": "ISC",
-  "description": "",
+  "description": "CLI tool for automating linux machine. Ai linux agent",
   "dependencies": {
     "@google/genai": "^1.12.0",
     "boxen": "^8.0.1",
     "chalk": "^5.5.0",
     "child_process": "^1.0.2",
+    "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "ora": "^8.2.0",
     "play-sound": "^1.1.6",

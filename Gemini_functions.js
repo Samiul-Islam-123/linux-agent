@@ -1,12 +1,14 @@
 import {GoogleGenAI} from '@google/genai';
 import { saveWaveFile, SystemConfig } from './util_functions.js';
+import { configDotenv } from 'dotenv';
 
 //geemini object
 const ai = new GoogleGenAI({
-    apiKey : `AIzaSyCusU1ks-rJMRvMaqj7vlmVudqG3WvbfIc`
+    apiKey : process.env.GEMINI_API_KEY
 });
 
 export function formatHistory(history, newPrompt) {
+  
   const contents = [
     ...history,
     { role: "user", parts: [{ text: newPrompt }] }
