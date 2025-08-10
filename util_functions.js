@@ -41,37 +41,32 @@ export async function playAudio(filePath) {
   }
 
 
-export async function runCommand(command) {
-  return new Promise((resolve) => {
-    console.log("Running command: " + command);
-
-    const [cmd, ...args] = command.split(" ");
-    const child = spawn(cmd, args, { shell: true });
-
-    let output = "";
-    let error = "";
-
-    child.stdout.on("data", (data) => {
-      output += data.toString();
+  export async function runCommand(command) {
+    return new Promise((resolve) => {
+      console.log("Running command: " + command);
+      
+      // split the command, this is important
+      const [cmd, ...args] = command.split(" ");
+      
+      // Set stdio to 'inherit' to make the child process interactive
+      const child = spawn(cmd, args, { 
+        stdio: 'inherit', 
+        shell: true 
+      });
+  
+      child.on("close", (code) => {
+        if (code === 0) {
+          resolve({ success: true, output: "Command completed successfully." });
+        } else {
+          resolve({ success: false, error: `Exited with code ${code}` });
+        }
+      });
+  
+      child.on("error", (err) => {
+        resolve({ success: false, error: err.message });
+      });
     });
-
-    child.stderr.on("data", (data) => {
-      error += data.toString();
-    });
-
-    child.on("close", (code) => {
-      if (code === 0) {
-        resolve({ success: true, output: output.trim() });
-      } else {
-        resolve({ success: false, error: error.trim() || `Exited with code ${code}` });
-      }
-    });
-
-    child.on("error", (err) => {
-      resolve({ success: false, error: err.message });
-    });
-  });
-}
+  }
 
 export const extractCommandBlock = (text) => {
   
@@ -101,6 +96,44 @@ export const extractCommandBlock = (text) => {
 
   return commands;
 };
+
+//thinking animation
+const frames = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+let i = 0;
+
+export function startThinking(message = "Thinking") {
+  process.stdout.write("\x1b[?25l"); // hide cursor
+  return setInterval(() => {
+    process.stdout.write(`\r${frames[i = ++i % frames.length]} ${message}...`);
+  }, 80);
+}
+
+export function stopThinking(interval) {
+  clearInterval(interval);
+  process.stdout.write("\r"); // clear line
+  process.stdout.write("\x1b[?25h"); // show cursor
+}
+
+export const SystemConfig = `
+      You are Silver, an intelligent Linux automation agent.
+
+      Rules:
+      1. Output only the required shell commands under "# COMMANDS".
+      2. If the user explicitly asks for details, add an "# EXPLANATION" section, use # EXPLANATION for everything other than command.
+      3. Always confirm before running destructive tasks.
+      4. Never wrap commands in backticks or markdown.
+      5. No inline comments in commands.
+      6. If multiple commands are needed, list them in correct order.
+      7. Always be safe, clear, and concise.
+      8. When explaining command results:
+         - If SUCCESS, just say "Command executed successfully."
+         - If ERROR, explain what went wrong and suggest fixes.
+      9. Keep messages short and actionable.
+      10. Say the answers in a user friendly terms. if anything technical is not asked to perform or any checking is requested then coem up with user friendly terms
+      11. come up with conclusive answers
+      12. while installing any sudo apt commands use -y flag by default 
+      13. start the conversation with a nice welcome message
+      `
 
 
 
