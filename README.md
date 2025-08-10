@@ -20,8 +20,6 @@ It lets you automate and control your Linux system through natural language. Jus
 ## 📦 Prerequisites
 
 - **Node.js**: Version 18.x or later.  
-- **A command-line audio player**: The `play-sound` dependency needs one of these installed:  
-  `mplayer`, `afplay`, `mpg123`, `mpg321`, `play`, `omxplayer`, or `aplay`.
 
 ---
 
@@ -116,5 +114,3 @@ Contributions, issues, and feature requests are welcome!
 Feel free to open an [issue](https://github.com/Samiul-Islam-123/linux-agent/issues) or submit a pull request.
 
 ---
-
-**Built with ❤️ by [Samiul Islam](https://github.com/Samiul-Islam-123)**
